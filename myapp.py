@@ -1,5 +1,6 @@
 import whisper
 import openai
+import speech_recognition as sr
 import streamlit as st
 import sounddevice as sd
 import soundfile as sf
@@ -16,20 +17,20 @@ import json
 import webbrowser
 
 openai.organization = "org-m8Slk26M4czyPKoVdX7E7J0L"
-API_KEY= "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"
+API_KEY= "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"
 openai.api_key = API_KEY
 
 
 
-model = whisper.load_model("base")
-def transcribe_aud(audio_name):
-    result = model.transcribe(audio_name)
-    print(result["text"])
-    return result["text"]
-
+# model = whisper.load_model("base")
+def transcribe_aud(audio_data, recognizer):
+    # result = model.transcribe(audio_name)
+    # print(result["text"])
+    # return result["text"]
+    text = recognizer.recognize_google(audio_data)
+    return  text
 
 def get_quiz(prompt):
-    st.write('Generating the quiz')
     Req = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
         messages=[
@@ -41,18 +42,24 @@ def get_quiz(prompt):
     return quiz_text
 
 
-def record(timer):
-    fs = 44100  # Sample rate
-    seconds = timer # Duration of recording
+def record(timer, recognizer):
+    # fs = 44100  # Sample rate
+    # seconds = timer # Duration of recording
 
-    # Start recording
-    recording = sd.rec(int(seconds * fs), samplerate=fs, channels=1)
-    st.write('Recording!')
-    sd.wait()  # Wait until recording is finished
-    st.write("Recording finished!")
+    # # Start recording
+    # recording = sd.rec(int(seconds * fs), samplerate=fs, channels=1)
+    # st.write('Recording!')
+    # sd.wait()  # Wait until recording is finished
+    # st.write("Recording finished!")
+   
 
-    with open('audio.wav', 'wb') as f:
-        sf.write(f.name, recording, fs)
+    # Use the microphone as the audio source
+    with sr.Microphone() as source:
+        st.write("Speak!")
+        audio_data = recognizer.record(source, duration=timer)
+    return audio_data
+    
+    
 
 
 def parse_result(quiz):
@@ -152,25 +159,33 @@ def generate_quiz(questions, options):
 
 
 if __name__ == "__main__":
-        
+
+  
     st.title("Quiz Generator")
+
     # st.write("Click the button below to start.")
     option = option = st.sidebar.selectbox("Select a Type Of  Prompt", ("Audio Prompt", "Text Prompt"))
     col1, col2, col3 = st.columns(3)
     if option == "Audio Prompt":
+        recognizer = sr.Recognizer()
         with col1:
             timer = st.radio("Select duration in seconds:", (5, 10, 20))
         with col2:
             st.write('')
             if st.button('Start Recording'):
-                record(timer)
-                st.write('')
+                audio_data = record(timer, recognizer)
+                prompt = transcribe_aud(audio_data, recognizer)
+                with open('prompt.txt', 'w') as f:
+                    f.write(prompt)
+                
+                st.write('finished recording!')
         with col3:
             st.write('')
             if st.button('Generate Quiz'):
-                st.write('transcribing the audio!')
-                prompt = transcribe_aud('audio.wav')
-                prompt = prompt + '\nThe quiz should have 4 questions each question have 4 options and give the answer for each question.'
+                st.write('Generating Quiz')
+                with open('prompt.txt', 'r') as f:
+                    prompt = f.read()
+                prompt += '\nThe quiz should have 4 questions each question have 4 options and give the answer for each question.'
                 quiz = get_quiz(prompt)
                 questions, options = parse_result(quiz)
                 url = generate_quiz(questions, options)
