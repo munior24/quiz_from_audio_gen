@@ -11,10 +11,10 @@ from google.auth.transport.requests import Request
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 import json
-
+import os
+API_KEY = os.environ.get("API_KEY")
 
 openai.organization = "org-m8Slk26M4czyPKoVdX7E7J0L"
-API_KEY= "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"
 openai.api_key = API_KEY
 
 
