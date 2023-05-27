@@ -1,4 +1,13 @@
-import speech_recognition as sr
+import subprocess
+import sys
+try:
+    import speech_recognition as sr
+except:
+    subprocess.run(["apt-get", "install", "libasound-dev"])
+    subprocess.run(["pip", "install", "Pyaudio"])
+    subprocess.run(["pip", "install", "SpeechRecognition"])
+    
+import speech_recognition as sr   
 import streamlit as st
 import time 
 import tempfile
