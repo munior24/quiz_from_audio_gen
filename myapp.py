@@ -1,9 +1,5 @@
-import whisper
-import openai
 import speech_recognition as sr
 import streamlit as st
-import sounddevice as sd
-import soundfile as sf
 import time 
 import tempfile
 import re
@@ -14,7 +10,7 @@ from google.auth.transport.requests import Request
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 import json
-import webbrowser
+
 
 openai.organization = "org-m8Slk26M4czyPKoVdX7E7J0L"
 API_KEY= "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"
@@ -22,11 +18,7 @@ openai.api_key = API_KEY
 
 
 
-# model = whisper.load_model("base")
 def transcribe_aud(audio_data, recognizer):
-    # result = model.transcribe(audio_name)
-    # print(result["text"])
-    # return result["text"]
     text = recognizer.recognize_google(audio_data)
     return  text
 
@@ -43,15 +35,6 @@ def get_quiz(prompt):
 
 
 def record(timer, recognizer):
-    # fs = 44100  # Sample rate
-    # seconds = timer # Duration of recording
-
-    # # Start recording
-    # recording = sd.rec(int(seconds * fs), samplerate=fs, channels=1)
-    # st.write('Recording!')
-    # sd.wait()  # Wait until recording is finished
-    # st.write("Recording finished!")
-   
 
     # Use the microphone as the audio source
     with sr.Microphone() as source:
