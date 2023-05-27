@@ -1,1 +1,2 @@
 libasound-dev
+portaudio19-dev
