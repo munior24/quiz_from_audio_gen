@@ -1,3 +1,4 @@
+openai
 Pyaudio
 SpeechRecognition
 aiohttp==3.8.4
