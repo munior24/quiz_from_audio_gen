@@ -3,6 +3,7 @@ import streamlit as st
 import time 
 import tempfile
 import re
+import openai
 from apiclient import discovery
 from httplib2 import Http
 from oauth2client import client, file, tools
